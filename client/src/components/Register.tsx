@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 interface Props {
@@ -6,6 +7,8 @@ interface Props {
 }
 
 const Register: React.FC<Props> = ({ toggleIsLogin }) => {
+  const navigate = useNavigate();
+
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -13,8 +16,13 @@ const Register: React.FC<Props> = ({ toggleIsLogin }) => {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    axios.post('http://localhost:3001/auth/register', { username, email, password, confirmPassword })
-      .then((response) => console.log(response.data))
+    axios.post('http://localhost:3001/auth/register', { user: username, email, password, confirmPassword })
+      .then((response) => {
+        console.log(response.data);
+        if(response.data.access_token.length > 1) {
+          navigate('/notes');
+        }
+      })
       .catch((error) => console.error(error));
   };
 

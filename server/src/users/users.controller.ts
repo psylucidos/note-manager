@@ -1,5 +1,7 @@
-import { Controller, Get, Post, Body, Put, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { UsersService } from './users.service';
+import authRequestUserInterface from 'src/auth/authrequser.interface';
 import { User } from './user.entity';
 
 @Controller('users')
@@ -7,26 +9,31 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
+  @UseGuards(AuthGuard('jwt'))
   async findAll(): Promise<User[]> {
     return this.usersService.findAll();
   }
 
   @Get(':id')
+  @UseGuards(AuthGuard('jwt'))
   async findOne(@Param('id') id: string): Promise<User> {
     return this.usersService.findOne(id);
   }
 
   @Post()
-  async create(@Body() user: User): Promise<User> {
+  @UseGuards(AuthGuard('jwt'))
+  async create(@Body() user: authRequestUserInterface): Promise<User> {
     return this.usersService.create(user);
   }
 
   @Put(':id')
+  @UseGuards(AuthGuard('jwt'))
   async update(@Param('id') id: string, @Body() user: User): Promise<User> {
     return this.usersService.update(id, user);
   }
 
   @Delete(':id')
+  @UseGuards(AuthGuard('jwt'))
   async remove(@Param('id') id: string): Promise<void> {
     return this.usersService.remove(id);
   }

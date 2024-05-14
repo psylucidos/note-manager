@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { setID, setToken, setUsername } from '../store/authslice';
 import axios from 'axios';
 
 interface Props {
@@ -6,13 +9,22 @@ interface Props {
 }
 
 const Login: React.FC<Props> = ({ toggleIsLogin }) => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    axios.post('http://localhost:3001/auth/login', { username, password })
-      .then((response) => console.log(response.data))
+    axios.post('http://localhost:3001/auth/login', { user: username, email: 'beau@gmail.com', password })
+      .then((response) => {
+        console.log(response.data);
+        if(response.data.access_token.length > 1) {
+          dispatch(setToken(response.data.access_token));
+          navigate('/notes');
+        }
+      })
       .catch((error) => console.error(error));
   };
 

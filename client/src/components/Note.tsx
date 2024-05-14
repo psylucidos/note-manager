@@ -14,6 +14,8 @@ interface NoteProps {
 const NoteComponent: React.FC<NoteProps> = ({ id }) => {
   const [note, setNote] = useState<Note | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
 
   useEffect(() => {
     const fetchNote = async () => {
@@ -30,6 +32,8 @@ const NoteComponent: React.FC<NoteProps> = ({ id }) => {
           setError('Missing required fields in API response');
         } else {
           setNote(res.data);
+          setTitle(res.data.title);
+          setContent(res.data.content);
         }
         console.log(res.data);
       })
@@ -41,6 +45,19 @@ const NoteComponent: React.FC<NoteProps> = ({ id }) => {
     fetchNote();
   }, [id]);
 
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const updatedNote = { id, title, content };
+    axios.put(`http://localhost:3001/notes/${id}`, updatedNote)
+    .then((res) => {
+      setNote(updatedNote);
+    })
+    .catch((err) => {
+      console.error(err);
+      setError('Error updating note');
+    });
+  };
+
   if (error) {
     return <div>Error: {error}</div>;
   }
@@ -51,8 +68,19 @@ const NoteComponent: React.FC<NoteProps> = ({ id }) => {
 
   return (
     <div>
-      <h2>{note.title}</h2>
-      <p>{note.content}</p>
+      <form onSubmit={handleSubmit}>
+        <label>
+          Title:
+          <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} />
+        </label>
+        <br />
+        <label>
+          Content:
+          <textarea value={content} onChange={(e) => setContent(e.target.value)} />
+        </label>
+        <br />
+        <button type="submit">Save</button>
+      </form>
     </div>
   );
 };

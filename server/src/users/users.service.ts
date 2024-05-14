@@ -1,7 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import crypto from 'crypto';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
+import authRequestUserInterface from 'src/auth/authrequser.interface';
+import * as argon2 from 'argon2';
 
 @Injectable()
 export class UsersService {
@@ -18,8 +21,14 @@ export class UsersService {
     return this.userRepository.findOneBy({ id });
   }
 
-  async create(user: User): Promise<User> {
-    return this.userRepository.save(user);
+  async findOneByEmail(email: string): Promise<User> {
+    return this.userRepository.findOneBy({ email });
+  }
+
+  async create(user: authRequestUserInterface): Promise<User> {
+    const salt = crypto.randomBytes(16).toString('hex');
+    const hashedPassword = await argon2.hash(user.password + salt);
+    return this.userRepository.save({ name: user.name, email: user.email, password: hashedPassword, salt: salt });
   }
 
   async update(id: string, user: User): Promise<User> {

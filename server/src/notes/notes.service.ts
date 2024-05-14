@@ -18,7 +18,24 @@ export class NotesService {
     return await this.noteRepository.findOneBy({ id });
   }
 
-  async create(note: Note): Promise<Note> {
+  async findAllByUser(userId: string): Promise<Partial<Note>[]> {
+    return await this.noteRepository.find({
+      where: { user: { id: userId } },
+      select: {
+        id: true,
+        title: true,
+        content: true,
+      },
+    }).then((notes) => {
+      return notes.map((note) => ({
+        id: note.id,
+        title: note.title,
+        content: note.content.substring(0, 20),
+      }));
+    });
+  }
+
+  async create(note: Partial<Note>): Promise<Note> {
     return await this.noteRepository.save(note);
   }
 
