@@ -3,6 +3,7 @@ import type { RootState } from '../store/store';
 import { useSelector } from 'react-redux'
 import axios from 'axios';
 import Note from '../components/Note';
+import '../css/notes.css';
 
 interface Note {
   id: string;
@@ -23,7 +24,8 @@ const NoteList = () => {
 
   useEffect(() => {
     const fetchNotes = async () => {
-      axios.get(`http://localhost:3001/notes/list/user/`, config)
+      console.log(config);
+      axios.get(`http://localhost:3001/notes/list`, config)
       .then((res) => {
         if (!res.data) {
           console.error('No data returned from API');

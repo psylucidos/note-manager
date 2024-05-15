@@ -18,7 +18,15 @@ export class NotesService {
     return await this.noteRepository.findOneBy({ id });
   }
 
-  async findAllByUser(userId: string): Promise<Partial<Note>[]> {
+  async findAllByUser(userID: string): Promise<Note[]> {
+    return await this.noteRepository.find({
+      where: { user: { id: userID } },
+    }).then((notes) => {
+      return notes;
+    });
+  }
+
+  async findAllSummarisedByUser(userId: string): Promise<Partial<Note>[]> {
     return await this.noteRepository.find({
       where: { user: { id: userId } },
       select: {

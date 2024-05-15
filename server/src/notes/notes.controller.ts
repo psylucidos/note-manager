@@ -19,10 +19,36 @@ export class NotesController {
     return await this.notesService.findOne(id);
   }
 
-  @Get('/list/user/')
+  @Get('/list')
   @UseGuards(AuthGuard('jwt'))
   async findListByUser(@Request() req): Promise<Partial<Note>[]> {
+    console.log('list!')
+    console.log(req.user);
+    return null;
+    // return await this.notesService.findAllSummarisedByUser(req.user.id);
+  }
+
+  @Get('/test')
+  @UseGuards(AuthGuard('jwt'))
+  async findTest(@Request() req): Promise<Partial<Note>[]> {
+    console.log('list!')
+    console.log(req.user);
+    return null;
+    // return await this.notesService.findAllSummarisedByUser(req.user.id);
+  }
+
+  @Get('/user')
+  @UseGuards(AuthGuard('jwt'))
+  async findByUser(@Request() req): Promise<Partial<Note>[]> {
     return await this.notesService.findAllByUser(req.user.id);
+  }
+
+  @Get('/user2')
+  @UseGuards(AuthGuard('jwt'))
+  async GetTest(@Request() req): Promise<Partial<Note>[]> {
+    // return await this.notesService.findAllByUser(req.user.id);
+    console.log('ok');
+    return null;
   }
 
   @Post()
