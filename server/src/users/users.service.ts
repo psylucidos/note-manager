@@ -1,9 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import crypto from 'crypto';
+import { randomBytes } from 'crypto';
+import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
-import authRequestUserInterface from 'src/auth/authrequser.interface';
+import { CreateUserDto } from './dto/create-user.dto';
 import * as argon2 from 'argon2';
 
 @Injectable()
@@ -25,10 +26,9 @@ export class UsersService {
     return this.userRepository.findOneBy({ email });
   }
 
-  async create(user: authRequestUserInterface): Promise<User> {
-    const salt = crypto.randomBytes(16).toString('hex');
-    const hashedPassword = await argon2.hash(user.password + salt);
-    return this.userRepository.save({ name: user.name, email: user.email, password: hashedPassword, salt: salt });
+  async create(user: CreateUserDto): Promise<User> {
+    const hashedPassword = await bcrypt.hash(user.password, 10);
+    return this.userRepository.save({ username: user.username, email: user.email, password: hashedPassword });
   }
 
   async update(id: string, user: User): Promise<User> {
@@ -36,7 +36,7 @@ export class UsersService {
     if (!existingUser) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
-    existingUser.name = user.name;
+    existingUser.username = user.username;
     existingUser.email = user.email;
     // Update other properties as needed
     return this.userRepository.save(existingUser);
