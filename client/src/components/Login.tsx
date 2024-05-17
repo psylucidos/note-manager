@@ -12,12 +12,12 @@ const Login: React.FC<Props> = ({ toggleIsLogin }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    axios.post('http://localhost:3001/auth/login', { user: username, email: 'beau@gmail.com', password })
+    axios.post('http://localhost:3001/auth/login', { user: email.split('@')[0], email: email, password })
       .then((response) => {
         console.log(response.data);
         if(response.data.access_token.length > 1) {
@@ -37,8 +37,8 @@ const Login: React.FC<Props> = ({ toggleIsLogin }) => {
           <input
             type="text"
             name="username"
-            value={username}
-            onChange={(event) => setUsername(event.target.value)}
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
           />
         </label>
         <br />

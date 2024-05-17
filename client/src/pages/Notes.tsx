@@ -26,21 +26,22 @@ const NoteList = () => {
     const fetchNotes = async () => {
       console.log(config);
       axios.get(`http://localhost:3001/notes/list`, config)
-      .then((res) => {
-        if (!res.data) {
-          console.error('No data returned from API');
-          setError('No data returned from API');
-        } else if (!Array.isArray(res.data)) {
-          console.error('Invalid data type returned from API');
-          setError('Invalid data type returned from API');
-        } else {
-          setNotes(res.data);
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-        setError('Error fetching notes from API');
-      });
+        .then((res) => {
+          if (!res.data) {
+            console.error('No data returned from API');
+            setError('No data returned from API');
+          } else if (!Array.isArray(res.data)) {
+            console.error('Invalid data type returned from API');
+            setError('Invalid data type returned from API');
+          } else {
+            console.log(res.data)
+            setNotes(res.data);
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+          setError('Error fetching notes from API');
+        });
     };
     fetchNotes();
   }, []);

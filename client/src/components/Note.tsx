@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../css/note.css';
+import { RootState } from '../store/store';
+import { useSelector } from 'react-redux';
 
 interface Note {
   id: string;
@@ -18,9 +20,15 @@ const NoteComponent: React.FC<NoteProps> = ({ id }) => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
 
+  const userToken = useSelector((state: RootState) => state.auth.token);
+
+  const config = {
+    headers: { Authorization: `Bearer ${userToken}` }
+  };
+
   useEffect(() => {
     const fetchNote = async () => {
-      axios.get(`http://localhost:3001/notes/${id}`)
+      axios.get(`http://localhost:3001/notes/id/${id}`, config)
       .then((res) => {
         if (!res.data) {
           console.error('No data returned from API');
@@ -49,7 +57,8 @@ const NoteComponent: React.FC<NoteProps> = ({ id }) => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const updatedNote = { id, title, content };
-    axios.put(`http://localhost:3001/notes/${id}`, updatedNote)
+    console.log('updating note')
+    axios.put(`http://localhost:3001/notes/${id}`, updatedNote, config)
     .then((res) => {
       setNote(updatedNote);
     })
