@@ -8,11 +8,12 @@ import '../css/notes.css';
 interface Note {
   id: string;
   title: string;
-  summary: string;
+  content: string;
 }
 
-const NoteList = () => {
+const Notes = () => {
   const userToken = useSelector((state: RootState) => state.auth.token);
+  const userID = useSelector((state: RootState) => state.auth.id);
 
   const [selectedNoteId, setSelectedNoteId] = useState<string>('');
   const [notes, setNotes] = useState<Note[]>([]);
@@ -50,22 +51,73 @@ const NoteList = () => {
     setSelectedNoteId(noteId);
   };
 
+  const handleDeleteNote = (noteId: string) => {
+    const newNotes = notes.filter((note) => note.id !== noteId);
+    setNotes(newNotes);
+  
+    if (newNotes.length > 0) {
+      setSelectedNoteId(newNotes[0].id);
+    } else {
+      setSelectedNoteId('');
+    }
+  };
+
+  const handleAddNote = () => {
+    const newNote = {
+      title: 'New Note',
+      content: '',
+      user: userID
+    };
+  
+    axios.post(`http://localhost:3001/notes/`, newNote, config)
+      .then((res) => {
+        if (!res.data) {
+          console.error('No data returned from API');
+          setError('No data returned from API');
+        } else {
+          console.log('added note:');
+          console.log(res.data);
+          setNotes([...notes, res.data]);
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        setError('Error creating note');
+      });
+  };
+
   if (error) {
     return <div>Error: {error}</div>;
   }
 
   return (
     <div>
-      <ul>
-        {notes.map((note) => (
-          <li key={note.id}>
-            <a onClick={() => handleNoteClick(note.id)}>{note.title}</a>
-          </li>
-        ))}
-      </ul>
-      {selectedNoteId && <Note id={selectedNoteId} />}
+      <header>
+        <h1>Note App</h1>
+      </header>
+      <div className="notes-container">
+        <div className="notes-list">
+          <h2>Notes</h2>
+          {notes.length === 0 ? (
+            <p>No notes available. Click the "Add Note" button to create a new note.</p>
+          ) : (
+            <ul>
+              {notes.map((note) => (
+                <li key={note.id}>
+                  <a onClick={() => handleNoteClick(note.id)}>{note.title}</a>
+                  <p>{note.content}...</p>
+                </li>
+              ))}
+            </ul>
+          )}
+          <button onClick={handleAddNote}>Add Note</button>
+        </div>
+        <div className="note-detail">
+          {selectedNoteId && <Note id={selectedNoteId} onDelete={() => handleDeleteNote(selectedNoteId)}/>}
+        </div>
+      </div>
     </div>
   );
 };
 
-export default NoteList;
+export default Notes;

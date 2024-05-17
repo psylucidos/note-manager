@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { setID, setToken, setUsername } from '../store/authslice';
 import axios from 'axios';
 
 interface Props {
@@ -7,6 +9,7 @@ interface Props {
 }
 
 const Register: React.FC<Props> = ({ toggleIsLogin }) => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const [username, setUsername] = useState('');
@@ -20,6 +23,8 @@ const Register: React.FC<Props> = ({ toggleIsLogin }) => {
       .then((response) => {
         console.log(response.data);
         if(response.data.access_token.length > 1) {
+          dispatch(setToken(response.data.access_token));
+          dispatch(setID(response.data.id));
           navigate('/notes');
         }
       })

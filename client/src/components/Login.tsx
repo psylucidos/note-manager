@@ -22,6 +22,7 @@ const Login: React.FC<Props> = ({ toggleIsLogin }) => {
         console.log(response.data);
         if(response.data.access_token.length > 1) {
           dispatch(setToken(response.data.access_token));
+          dispatch(setID(response.data.id));
           navigate('/notes');
         }
       })
